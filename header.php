@@ -40,6 +40,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
         page. However, you can choose any other skin. Make sure you
         apply the skin class to the body tag so the changes take effect. -->
   <link rel="stylesheet" href="dist/css/skins/skin-blue.min.css">
+    
+  <!-- Select2 -->
+  <link rel="stylesheet" href="bower_components/select2/dist/css/select2.min.css">
 
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -67,6 +70,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
  <!-- iCheck 1.0.1 -->
 <script src="plugins/iCheck/icheck.min.js"></script>
+    
+<!-- Select2 -->
+<script src="bower_components/select2/dist/js/select2.full.min.js"></script>
   
 </head>
 <!--

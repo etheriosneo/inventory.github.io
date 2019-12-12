@@ -3,6 +3,23 @@ include_once 'connectdb.php';
 
 session_start();
 
+function fill_product($pdo){
+    
+    $output = '';
+    
+    $select = $pdo->prepare("select * from product order by pname asc");
+    $select->execute();
+    
+    $result = $select->fetchAll();
+    
+    foreach($result as $row){
+        
+        $output.='<option value="'.$row["pid"].'">'.$row["pname"].'</option>';
+    }
+    
+    return $output;
+}
+
 include_once 'header.php';
 
 ?>
@@ -70,7 +87,7 @@ include_once 'header.php';
           <div class="box-body">
 
             <div class="col-md-12">
-
+                <div style="overflow-x:auto;">
             <table id="tableProduct" class="table table-striped">
                 <thead>
                 <tr>
@@ -84,7 +101,7 @@ include_once 'header.php';
                     </tr>
                 </thead>
             </table>
-
+                </div>
             </div>
 
           </div>
@@ -214,7 +231,7 @@ $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck(
            html+='<tr>';
            html+='<td><input type="hidden" class="form-control pname" name="productname[]" required readonly></td>';
            
-           html+='<td><select class="form-control productid" name="productid[]"><option value="">Select Option</option></select></td>';
+           html+='<td><select class="form-control productid" name="productid[]"><option value="">Select Option</option><?php echo fill_product($pdo); ?></select></td>';
            
            html+='<td><input type="text" class="form-control stock" name="stock[]" readonly></td>';
            html+='<td><input type="text" class="form-control price" name="price[]" readonly></td>';
@@ -222,6 +239,29 @@ $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck(
            html+='<td><input type="text" class="form-control total" name="total[]" readonly></td>';
            html+='<td><center><button type="button" name="remove" class="btn btn-danger btn-sm btnremove"><span class="glyphicon glyphicon-remove"></span></button></center></td>';
            $('#tableProduct').append(html);
+            
+            $('.productid').select2()
+            
+            $('.productid').on('change', function(e){
+                
+                var productid = this.value;
+                var tr = $(this).parent().parent();
+                
+                $.ajax({
+                    
+                    url:"getproduct.php",
+                    method:"get",
+                    data:{id:productid},
+                    success:function(data){
+                        
+                        tr.find(".stock").val(data["pstock"]);
+                        tr.find(".price").val(data["sellingprice"]);
+                        tr.find(".quantity").val(1);
+                        tr.find(".total").val(tr.find(".quantity").val() * tr.find(".price").val() );
+                    }
+                    
+                })
+            })
         })
 
         $(document).on('click','.btnremove',function(){
@@ -229,6 +269,8 @@ $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck(
             $(this).closest('tr').remove();
 
         })
+        
+        
 
     })
 </script>
