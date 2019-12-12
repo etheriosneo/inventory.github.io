@@ -80,7 +80,7 @@ include_once 'header.php';
                     <th>Price</th>
                     <th>Enter Quantity</th>
                     <th>Total</th>
-                    <th><button type="button" name="add" class="btn btn-success btn-sm btnadd"><span class="glyphicon glyphicon-plus"></span></button></th>
+                    <th><center><button type="button" name="add" class="btn btn-success btn-sm btnadd"><span class="glyphicon glyphicon-plus"></span></button></center></th>
                     </tr>
                 </thead>
             </table>
@@ -212,13 +212,22 @@ $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck(
 
            var html = '';
            html+='<tr>';
-           html+='<td><input type="text" class="form-control pname" name="productname[]" required></td>';
-           html+='<td><input type="text" class="form-control productid" name="productid[]" required></td>';
-           html+='<td><input type="text" class="form-control stock" name="stock[]" required></td>';
-           html+='<td><input type="text" class="form-control price" name="price[]" required></td>';
-           html+='<td><input type="text" class="form-control quantity" name="quantity[]" required></td>';
-           html+='<td><input type="text" class="form-control total" name="total[]" required></td>';
+           html+='<td><input type="hidden" class="form-control pname" name="productname[]" required readonly></td>';
+           
+           html+='<td><select class="form-control productid" name="productid[]"><option value="">Select Option</option></select></td>';
+           
+           html+='<td><input type="text" class="form-control stock" name="stock[]" readonly></td>';
+           html+='<td><input type="text" class="form-control price" name="price[]" readonly></td>';
+           html+='<td><input type="text" class="form-control quantity" name="quantity[]" ></td>';
+           html+='<td><input type="text" class="form-control total" name="total[]" readonly></td>';
+           html+='<td><center><button type="button" name="remove" class="btn btn-danger btn-sm btnremove"><span class="glyphicon glyphicon-remove"></span></button></center></td>';
            $('#tableProduct').append(html);
+        })
+
+        $(document).on('click','.btnremove',function(){
+
+            $(this).closest('tr').remove();
+
         })
 
     })
