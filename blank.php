@@ -21,10 +21,16 @@ include_once 'header.php';
     <!-- Main content -->
     <section class="content container-fluid">
 
-      <!--------------------------
-        | Your Page Content Here |
-        -------------------------->
-
+      <div class="box box-warning">
+        
+            <div class="box-header with-border">
+            
+            
+                <h3 class="box-title">View Product</h3>
+            </div>
+          
+          <div class="box-body"></div>
+        </div>
     </section>
     <!-- /.content -->
   </div>

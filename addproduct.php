@@ -58,32 +58,8 @@ if(isset($_POST['addproductbtn'])){
             if(move_uploaded_file($f_tmp, $store)){
                 
                 $productimage = $f_newfile;
-            }
-        }
-    }
-    
-    else{
-        
-        $error = '<script type="text/javascript">
-        
-        jQuery(function validation(){
-        
-        swal({
-              title: "Error!",
-              text: "Only jpg, png and gif files allowed",
-              icon: "error",
-              button: "Ok",
-              });
-        
-        });
-        
-        </script>';
-            
-        echo $error;
-
-    }
-    
-    if(!isset($error)){
+                
+                if(!isset($error)){
         
         $insert = $pdo->prepare("insert into product(pname, pcategory, purchaseprice, sellingprice, pstock, pdescription, pimage) values (:pname, :pcategory, :purchaseprice, :sellingprice, :pstock, :pdescription, :pimage)");
         
@@ -132,6 +108,32 @@ if(isset($_POST['addproductbtn'])){
         }
         
     }
+            }
+        }
+    }
+    
+    else{
+        
+        $error = '<script type="text/javascript">
+        
+        jQuery(function validation(){
+        
+        swal({
+              title: "Error!",
+              text: "Only jpg, png and gif files allowed",
+              icon: "error",
+              button: "Ok",
+              });
+        
+        });
+        
+        </script>';
+            
+        echo $error;
+
+    }
+    
+    
 }
 
 ?>

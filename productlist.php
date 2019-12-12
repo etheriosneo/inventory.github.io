@@ -67,9 +67,9 @@ include_once 'header.php';
                         <td>'.$row->pstock.'</td>
                         <td>'.$row->pdescription.'</td>
                         <td><img src = "productimages/'.$row->pimage.'" class="img-rounded" width="40px" height="40px"/> </td>
-                        <td><a href="registration.php?id='.$row->pid.'"><span class="glyphicon glyphicon-trash title="delete"></span></a></td>
-                        <td><a href="registration.php?id='.$row->pid.'"><span class="glyphicon glyphicon-trash title="delete"></span></a></td>
-                        <td><a href="registration.php?id='.$row->pid.'"><span class="glyphicon glyphicon-trash title="delete"></span></a></td>
+                        <td><a href="viewproduct.php?id='.$row->pid.'"><span class="glyphicon glyphicon-eye-open title="view"></span></a></td>
+                        <td><a href="editproduct.php?id='.$row->pid.'"><span class="glyphicon glyphicon-pencil title="edit"></span></a></td>
+                        <td><a href="deleteproduct.php?id='.$row->pid.'"><span class="glyphicon glyphicon-trash title="delete"></span></a></td>
                         </tr>';
                     }
                     
