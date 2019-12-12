@@ -4,6 +4,11 @@ include_once 'connectdb.php';
 
 session_start();
 
+if($_SESSION['useremail'] == "" OR $_SESSION['role'] == "User"){
+    
+  header('location:index.php');
+}
+
 include_once 'header.php';
 
 ?>
@@ -30,7 +35,7 @@ include_once 'header.php';
             <div class="box-header with-border">
             
             
-                <h3 class="box-title">View Product</h3>
+                <h3 class="box-title"><a href="productlist.php" class="btn btn-primary" role="button">Back to product list</a></h3>
             </div>
           
           <div class="box-body">

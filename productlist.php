@@ -4,7 +4,15 @@ include_once 'connectdb.php';
 
 session_start();
 
+if($_SESSION['useremail'] == "" OR $_SESSION['role'] == "User"){
+    
+  header('location:index.php');
+}
+
 include_once 'header.php';
+
+
+
 ?>
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
@@ -69,7 +77,7 @@ include_once 'header.php';
                         <td><img src = "productimages/'.$row->pimage.'" class="img-rounded" width="40px" height="40px"/> </td>
                         <td><a href="viewproduct.php?id='.$row->pid.'"><span class="glyphicon glyphicon-eye-open title="view"></span></a></td>
                         <td><a href="editproduct.php?id='.$row->pid.'"><span class="glyphicon glyphicon-pencil title="edit"></span></a></td>
-                        <td><a href="deleteproduct.php?id='.$row->pid.'"><span class="glyphicon glyphicon-trash title="delete"></span></a></td>
+                        <td><button id='.$row->pid.' class="btn btn-danger btndelete"><span class="glyphicon glyphicon-trash title="delete"></span></button></td>
                         </tr>';
                     }
                     
@@ -90,6 +98,57 @@ include_once 'header.php';
     });
 } );
     
+</script>
+<script>
+
+$(document).ready(function(){
+
+  $('.btndelete').click(function(){
+
+    var tdh = $(this);
+    var id = $(this).attr("id");
+    //alert(id);
+
+    swal({
+  title: "Are you sure you want to delete the product?",
+  text: "Once deleted, you will not be able to recover your product",
+  icon: "warning",
+  buttons: true,
+  dangerMode: true,
+})
+.then((willDelete) => {
+  if (willDelete) {
+
+    $.ajax({
+
+url:'productdelete.php',
+type: 'post',
+data:{
+
+  pidd: id
+},
+success:function(data){
+
+  tdh.parents('tr').hide();
+
+}
+
+})
+
+    swal("Your product has been deleted!", {
+      icon: "success",
+    });
+  } else {
+    swal("Your product is safe!");
+  }
+});
+
+    
+
+  });
+
+});  
+
 </script>
  <?php
 
