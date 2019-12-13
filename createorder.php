@@ -88,7 +88,7 @@ include_once 'header.php';
 
             <div class="col-md-12">
                 <div style="overflow-x:auto;">
-            <table id="tableProduct" class="table table-striped">
+            <table class="table table-striped" id="tableProduct">
                 <thead>
                 <tr>
                     <th>#</th>
@@ -115,7 +115,7 @@ include_once 'header.php';
                   <div class="input-group-addon">
                     <i class="fa fa-usd"></i>
                   </div>
-                  <input type="text" class="form-control" name="subtotal" required>
+                  <input type="text" class="form-control" name="subtotal" id="subtotal" required>
                     </div>
                 </div>
 
@@ -127,7 +127,7 @@ include_once 'header.php';
                   <div class="input-group-addon">
                     <i class="fa fa-usd"></i>
                   </div>
-                  <input type="text" class="form-control" name="tax" required>
+                  <input type="text" class="form-control" name="tax" id="tax" required>
                     </div>
                 </div>
 
@@ -137,7 +137,7 @@ include_once 'header.php';
                   <div class="input-group-addon">
                     <i class="fa fa-usd"></i>
                   </div>
-                  <input type="text" class="form-control" name="discount" required>
+                  <input type="number" class="form-control" name="discount" id="discount">
                     </div>
                 </div>
                 </div>
@@ -152,7 +152,7 @@ include_once 'header.php';
                   <div class="input-group-addon">
                     <i class="fa fa-usd"></i>
                   </div>
-                  <input type="text" class="form-control" name="total" required>
+                  <input type="text" class="form-control" name="total" id="total" required>
                 </div>
                 </div>
 
@@ -164,7 +164,7 @@ include_once 'header.php';
                   <div class="input-group-addon">
                     <i class="fa fa-usd"></i>
                   </div>
-                  <input type="text" class="form-control" name="paid" required>
+                  <input type="text" class="form-control" name="paid" id="paid" required>
                 </div>
                 </div>
 
@@ -174,7 +174,7 @@ include_once 'header.php';
                   <div class="input-group-addon">
                     <i class="fa fa-usd"></i>
                   </div>
-                  <input type="text" class="form-control" name="due" required>
+                  <input type="text" class="form-control" name="due" id="due" required>
                 </div>
                 </div>
                 <br>
@@ -257,7 +257,8 @@ $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck(
                         tr.find(".stock").val(data["pstock"]);
                         tr.find(".price").val(data["sellingprice"]);
                         tr.find(".quantity").val(1);
-                        tr.find(".total").val(tr.find(".quantity").val() * tr.find(".price").val() );
+                        tr.find(".total").val(tr.find(".quantity").val() * tr.find(".price").val());
+                        calculate(0,0);
                     }
                     
                 })
@@ -267,12 +268,74 @@ $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck(
         $(document).on('click','.btnremove',function(){
 
             $(this).closest('tr').remove();
+            calculate(0,0);
+            $("#paid").val(0);
 
         })
-        
-        
 
-    })
+        $("#tableProduct").delegate('.quantity','keyup', function(){
+
+                      var quantity =$(this);
+                      var tr = $(this).parent().parent();
+                      if( (quantity.val()-0)>(tr.find(".stock").val()-0) ){
+
+                        swal("Warning!","Stock not available","warning");
+                        quantity.val(1);
+                        tr.find(".total").val(quantity.val() * tr.find(".price").val());
+                        
+                      }
+
+                      else{
+
+                        tr.find(".total").val(quantity.val() * tr.find(".price").val());
+
+                      }
+
+              })
+
+          function calculate(dis,paid){
+
+            var subtotal = 0;
+            var tax = 0;
+            var discount = dis;
+            var nettotal = 0;
+            var paidamount = paid;
+            var due = 0;
+
+            $(".total").each(function(){
+
+              subtotal = subtotal+($(this).val()*1);
+
+            })
+
+            tax = 0.05 * subtotal;
+            nettotal = tax + subtotal;
+            nettotal = nettotal - discount;
+            due = nettotal - paidamount;
+
+            $("#subtotal").val(subtotal.toFixed(2));
+            $("#tax").val(tax.toFixed(2));
+            $("#total").val(nettotal.toFixed(2));
+            $("#discount").val(discount);
+            $("#due").val(due.toFixed(2));
+
+          }
+
+          $("#discount").keyup(function(){
+
+            var discount = $(this).val();
+            calculate(discount,0);
+
+          })
+
+          $('#paid').keyup(function(){
+
+            var paid = $(this).val();
+            var discount = $("#discount").val();
+            calculate(discount,paid);
+          })
+              
+          });
 </script>
  <?php
 
