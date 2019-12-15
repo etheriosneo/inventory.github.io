@@ -20,6 +20,63 @@ function fill_product($pdo){
     return $output;
 }
 
+if(isset($_POST['saveorderbtn'])){
+    
+    $customername = $_POST['customer'];
+    $orderdate = date('Y-m-d',strtotime($_POST['orderdate']));
+    $subtotal = $_POST['subtotal'];
+    $tax = $_POST['tax'];
+    $discount = $_POST['discount'];
+    $total = $_POST['total'];
+    $paid = $_POST['paid'];
+    $due = $_POST['due'];
+    $paymenttype = $_POST['rb'];
+    
+    ///////////////////////////
+    
+    $arr_productid = $_POST['productid'];
+    $arr_productname = $_POST['productname'];
+    $arr_stock = $_POST['stock'];
+    $arr_quantity = $_POST['quantity'];
+    $arr_price = $_POST['price'];
+    $arr_total = $_POST['total'];
+    
+    $insert = $pdo->prepare("insert into invoice (customername,orderdate,subtotal,tax,discount,total,paid,due,paymentype) values(:customername,:orderdate,:subtotal,:tax,:discount,:total,:paid,:due,:paymentype)");
+    
+    $insert->bindParam(':customername',$customername);
+    $insert->bindParam(':orderdate',$orderdate);
+    $insert->bindParam(':subtotal',$subtotal);
+    $insert->bindParam(':tax',$tax);
+    $insert->bindParam(':discount',$discount);
+    $insert->bindParam(':total',$total);
+    $insert->bindParam(':paid',$paid);
+    $insert->bindParam(':due',$due);
+    $insert->bindParam(':paymentype',$paymenttype);
+    
+    $insert->execute();
+    
+    $invoiceid = $pdo->lastInsertId();
+    if($invoiceid!= null){
+        
+        for($i=0; $i<count($arr_productid); $i++){
+            
+            $insert = $pdo->prepare("insert into invoice_details(invoiceid,productid,productname,quantity,price,orderdate) values(:invoiceid,:productid,:productname,:quantity,:price,:orderdate)");
+            
+            $insert->bindParam(':invoiceid',$invoiceid);
+            $insert->bindParam(':productid',$arr_productid[$i]);
+            $insert->bindParam(':productname',$arr_productname[$i]);
+            $insert->bindParam(':quantity',$arr_quantity[$i]);
+            $insert->bindParam(':price',$arr_price[$i]);
+            $insert->bindParam(':orderdate',$orderdate);
+            
+            $insert->execute();
+            echo "order created";
+            
+        }
+    }
+    
+}
+
 include_once 'header.php';
 
 ?>
@@ -76,13 +133,15 @@ include_once 'header.php';
                   <div class="input-group-addon">
                     <i class="fa fa-calendar"></i>
                   </div>
-                  <input type="text" class="form-control pull-right" id="datepicker">
+                  <input type="text" class="form-control pull-right" id="datepicker" name="orderdate" value="<?php
+                                                                                                             
+                                                                                                             echo date("Y-m-d");?>" data-date-format="yyyy-mm-dd">
                 </div>
                 <!-- /.input group -->
               </div>
 
           </div>
-          
+              </div>
           
           <div class="box-body">
 
@@ -115,7 +174,7 @@ include_once 'header.php';
                   <div class="input-group-addon">
                     <i class="fa fa-usd"></i>
                   </div>
-                  <input type="text" class="form-control" name="subtotal" id="subtotal" required>
+                  <input type="text" class="form-control" name="subtotal" id="subtotal" required readonly>
                     </div>
                 </div>
 
@@ -127,7 +186,7 @@ include_once 'header.php';
                   <div class="input-group-addon">
                     <i class="fa fa-usd"></i>
                   </div>
-                  <input type="text" class="form-control" name="tax" id="tax" required>
+                  <input type="text" class="form-control" name="tax" id="tax" required readonly>
                     </div>
                 </div>
 
@@ -141,9 +200,9 @@ include_once 'header.php';
                     </div>
                 </div>
                 </div>
-
+              
         
-          <div class="box-body">
+          
           <div class="col-md-6">
 
           <div class="form-group">
@@ -152,7 +211,7 @@ include_once 'header.php';
                   <div class="input-group-addon">
                     <i class="fa fa-usd"></i>
                   </div>
-                  <input type="text" class="form-control" name="total" id="total" required>
+                  <input type="text" class="form-control" name="total" id="total" required readonly>
                 </div>
                 </div>
 
@@ -174,7 +233,7 @@ include_once 'header.php';
                   <div class="input-group-addon">
                     <i class="fa fa-usd"></i>
                   </div>
-                  <input type="text" class="form-control" name="due" id="due" required>
+                  <input type="text" class="form-control" name="due" id="due" required readonly>
                 </div>
                 </div>
                 <br>
@@ -184,13 +243,13 @@ include_once 'header.php';
             <div class="form-group">
               
                 <label>
-                  <input type="radio" name="r2" class="minimal-red" checked>CASH
+                  <input type="radio" name="rb" class="minimal-red" checked value="Cash">CASH
                 </label>
                 <label>
-                  <input type="radio" name="r2" class="minimal-red">CARD
+                  <input type="radio" name="rb" class="minimal-red" value="Card">CARD
                 </label>
                 <label>
-                  <input type="radio" name="r2" class="minimal-red">CHECK
+                  <input type="radio" name="rb" class="minimal-red" value="Check">CHECK
                
                 </label>
               </div> 
@@ -202,7 +261,7 @@ include_once 'header.php';
         <hr>
         <div align="center">
 
-        <input type="submit" name="saveorder" value="Save Order" class="btn btn-info">
+        <input type="submit" name="saveorderbtn" value="Save Order" class="btn btn-info">
         </div>
         <hr>
         </form>
@@ -229,7 +288,7 @@ $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck(
 
            var html = '';
            html+='<tr>';
-           html+='<td><input type="hidden" class="form-control pname" name="productname[]" required readonly></td>';
+           html+='<td><input type="text" class="form-control pname" name="productname[]" readonly></td>';
            
            html+='<td><select class="form-control productid" name="productid[]"><option value="">Select Option</option><?php echo fill_product($pdo); ?></select></td>';
            
@@ -252,8 +311,9 @@ $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck(
                     url:"getproduct.php",
                     method:"get",
                     data:{id:productid},
-                    success:function(data){
+                    success:function(data){     
                         
+                        tr.find(".pname").val(data["pname"]);
                         tr.find(".stock").val(data["pstock"]);
                         tr.find(".price").val(data["sellingprice"]);
                         tr.find(".quantity").val(1);
@@ -318,7 +378,7 @@ $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck(
             $("#total").val(nettotal.toFixed(2));
             $("#discount").val(discount);
             $("#due").val(due.toFixed(2));
-
+              
           }
 
           $("#discount").keyup(function(){
