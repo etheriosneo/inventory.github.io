@@ -1,8 +1,6 @@
 <?php 
 include_once 'connectdb.php';
-
 session_start();
-
 function fill_product($pdo){
     
     $output = '';
@@ -19,7 +17,6 @@ function fill_product($pdo){
     
     return $output;
 }
-
 if(isset($_POST['saveorderbtn'])){
     
     $customername = $_POST['customer'];
@@ -59,6 +56,24 @@ if(isset($_POST['saveorderbtn'])){
     if($invoiceid!= null){
         
         for($i=0; $i<count($arr_productid); $i++){
+
+          $remaiming_quantity = $arr_stock[$i] - $arr_quantity[$i];
+          if($remaiming_quantity <0){
+
+            return "Order Not Complete!";
+          }
+
+          else{
+
+            $update = $pdo->prepare("update product set pstock = '$remaiming_quantity' where pid = '".$arr_productid[$i]."'");
+            $update->execute();
+          }
+
+
+
+
+
+
             
             $insert = $pdo->prepare("insert into invoice_details(invoiceid,productid,productname,quantity,price,orderdate) values(:invoiceid,:productid,:productname,:quantity,:price,:orderdate)");
             
@@ -70,15 +85,16 @@ if(isset($_POST['saveorderbtn'])){
             $insert->bindParam(':orderdate',$orderdate);
             
             $insert->execute();
-            echo "order created";
+           
             
         }
+
+        echo "order created";
+        header('location:orderlist.php');
     }
     
 }
-
 include_once 'header.php';
-
 ?>
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
@@ -275,17 +291,13 @@ include_once 'header.php';
 $('#datepicker').datepicker({
       autoclose: true
     })
-
 //Red color scheme for iCheck
 $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck({
       checkboxClass: 'icheckbox_minimal-red',
       radioClass   : 'iradio_minimal-red'
     })
-
     $(document).ready(function(){
-
         $(document).on('click','.btnadd',function(){
-
            var html = '';
            html+='<tr>';
            html+='<td><input type="text" class="form-control pname" name="productname[]" readonly></td>';
@@ -324,55 +336,40 @@ $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck(
                 })
             })
         })
-
         $(document).on('click','.btnremove',function(){
-
             $(this).closest('tr').remove();
             calculate(0,0);
             $("#paid").val(0);
-
         })
-
         $("#tableProduct").delegate('.quantity','keyup', function(){
-
                       var quantity =$(this);
                       var tr = $(this).parent().parent();
                       if( (quantity.val()-0)>(tr.find(".stock").val()-0) ){
-
                         swal("Warning!","Stock not available","warning");
                         quantity.val(1);
                         tr.find(".total").val(quantity.val() * tr.find(".price").val());
+                        calculate(0,0);
                         
                       }
-
                       else{
-
                         tr.find(".total").val(quantity.val() * tr.find(".price").val());
-
+                        calculate(0,0);
                       }
-
               })
-
           function calculate(dis,paid){
-
             var subtotal = 0;
             var tax = 0;
             var discount = dis;
             var nettotal = 0;
             var paidamount = paid;
             var due = 0;
-
             $(".total").each(function(){
-
               subtotal = subtotal+($(this).val()*1);
-
             })
-
             tax = 0.05 * subtotal;
             nettotal = tax + subtotal;
             nettotal = nettotal - discount;
             due = nettotal - paidamount;
-
             $("#subtotal").val(subtotal.toFixed(2));
             $("#tax").val(tax.toFixed(2));
             $("#total").val(nettotal.toFixed(2));
@@ -380,16 +377,11 @@ $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck(
             $("#due").val(due.toFixed(2));
               
           }
-
           $("#discount").keyup(function(){
-
             var discount = $(this).val();
             calculate(discount,0);
-
           })
-
           $('#paid').keyup(function(){
-
             var paid = $(this).val();
             var discount = $("#discount").val();
             calculate(discount,paid);
@@ -398,7 +390,5 @@ $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck(
           });
 </script>
  <?php
-
 include_once 'footer.php';
-
 ?>
